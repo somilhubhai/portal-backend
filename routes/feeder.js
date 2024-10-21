@@ -15,8 +15,12 @@ const Category = mongoose.model("Category", categorySchema);
 router.post("/add-new", async (req, res) => {
   const { name, phone, address, cname, chapter, category, notes } = req.body;
 
+ 
+  if (!name || !phone || !address || !cname || !chapter || !category) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
   try {
-
+   
     const feeder = await Feeder.create({
       name,
       phone,
@@ -32,12 +36,14 @@ router.post("/add-new", async (req, res) => {
         existingCategory = await Category.create({ category });
       }
 
-      return res.json({ success: true, feeder, category: existingCategory });
+      return res.status(201).json({ success: true, feeder, category: existingCategory });
     }
   } catch (error) {
-    return res.json({ error: error.message });
+    console.error("Error creating feeder:", error.message);
+    return res.status(500).json({ error: error.message });
   }
 });
+
 
 // render all category
 router.get("/category" , async(req , res) => {
